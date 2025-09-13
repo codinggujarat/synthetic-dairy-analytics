@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<!-- Full-screen container with VIDEO background -->
+<div class="relative min-h-screen flex items-center justify-center">
+
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
+        <source src="{{ url_for('static', filename='mp3/hero.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Background Music -->
+    <audio autoplay loop>
+        <source src="{{ url_for('static', filename='mp3/hero.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Overlay for readability -->
+    <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+
+    <!-- White Card Form -->
+    <div class="relative z-10 bg-white p-8  shadow-xl w-full max-w-md">
+        <h2 class="text-3xl font-medium text-gray-800 text-center uppercase">
+            Signup
+        </h2>
+
+        <!-- Signup Form -->
+        <form method="POST" class="mt-6 space-y-6">
+            <!-- Email input with floating label -->
+            <div class="relative w-full">
+                <input type="email" name="email" id="email" required
+                    class="peer block w-full px-4 pt-6 pb-2 text-black placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-600 focus:ring-0 focus:outline-none">
+                <label for="email"
+                    class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-600">
+                    Email
+                </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit"
+                class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition text-white font-medium px-5 py-3  shadow w-full">
+                Send OTP
+            </button>
+        </form>
+
+        <!-- Link to Login -->
+        <p class="text-center text-gray-600 text-sm mt-4">
+            Already have an account?
+            <a href="{{ url_for('auth.login') }}" class="text-green-600 hover:underline font-medium">
+                Login
+            </a>
+        </p>
+    </div>
+</div>
+{% endblock %}

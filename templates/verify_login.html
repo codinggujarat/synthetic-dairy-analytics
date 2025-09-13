@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="relative min-h-screen flex items-center justify-center">
+
+    <!-- Background Video -->
+    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
+        <source src="{{ url_for('static', filename='mp3/hero.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Background Music -->
+    <audio autoplay loop>
+        <source src="{{ url_for('static', filename='mp3/hero.mp3') }}" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- Overlay -->
+    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
+
+    <!-- White Card for OTP Form -->
+    <div class="relative z-10 bg-white p-8  shadow-xl w-full max-w-md">
+        <h2 class="text-3xl font-medium text-gray-800 text-center uppercase">
+            Verify OTP
+        </h2>
+
+        <!-- OTP Form -->
+        <form method="POST" id="otpForm" class="mt-6 space-y-6 flex flex-col items-center">
+            <!-- 6 OTP Boxes -->
+            <div class="flex justify-center gap-3">
+                {% for i in range(6) %}
+                <input type="text" name="otp{{ i }}" maxlength="1"
+                    class="otp-input w-12 h-12 text-center border-2 border-gray-300 rounded-lg text-xl font-bold focus:border-green-600 focus:ring-0 focus:outline-none"
+                    required>
+                {% endfor %}
+            </div>
+
+            <!-- Hidden field to store combined OTP -->
+            <input type="hidden" name="otp" id="otpHidden">
+
+            <!-- Verify Button -->
+            <button type="submit"
+                class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition text-white font-medium px-5 py-3 shadow w-full">
+                Verify & Login
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- JS for OTP Auto-Move & Combine -->
+<script>
+    const inputs = document.querySelectorAll(".otp-input");
+    const hiddenOtp = document.getElementById("otpHidden");
+
+    inputs.forEach((input, index) => {
+        input.addEventListener("input", () => {
+            if (input.value.length === 1 && index < inputs.length - 1) {
+                inputs[index + 1].focus();
+            }
+            updateHiddenOtp();
+        });
+
+        input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && input.value === "" && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+    });
+
+    function updateHiddenOtp() {
+        hiddenOtp.value = Array.from(inputs).map(i => i.value).join("");
+    }
+
+    document.getElementById("otpForm").addEventListener("submit", (e) => {
+        updateHiddenOtp();
+    });
+</script>
+{% endblock %}

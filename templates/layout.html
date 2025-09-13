@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Cattle Monitoring Platform</title>
+    <!-- Boxicons CDN -->
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link
+        href="https://api.fontshare.com/v2/css?f[]=general-sans@200,300,400,500,700&f[]=clash-grotesk@200,300,400,700&f[]=chillax@200,400,500,700&f[]=panchang@200,300,400,500,600&f[]=poppins@100,200,300&f[]=quicksand@300,400,500&display=swap"
+        rel="stylesheet">
+    <!-- Tailwind CSS + jQuery + DataTables -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.3.2/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.tailwind.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <script src="https://unpkg.com/scrollreveal"></script>
+
+    <style>
+        * {
+            font-family: 'General Sans', sans-serif !important;
+        }
+
+        /* Simple slide-in animation */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+    <!-- Navbar -->
+    <nav class="bg-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+
+                <!-- Brand with Logo -->
+                <a href="{{ url_for('index') }}" class="flex items-center space-x-2">
+
+                    <!-- Logo -->
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-md bg-[#8DC972] flex items-center justify-center">
+                            <img src="{{ url_for('static', filename='img/cowhero.png') }}" alt="Logo"
+                                class="h-50 w-auto">
+                            <i class="fas fa-wave-square text-white text-lg"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-lg font-semibold">
+                                <span class="text-[#6BAE55]">SmartDairy</span>
+                                <span class="text-[#6CB7D8]">AI</span>
+                            </h1>
+                            <p class="text-sm text-gray-500 -mt-1">AI-Powered Dairy Management</p>
+                        </div>
+                    </div>
+                </a>
+
+
+                <!-- Menu -->
+                <div class="flex items-center space-x-4">
+                    {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('train_manual') }}"
+                        class="text-green-600 hover:bg-green-50 px-3 py-2 rounded-md text-sm font-medium transition">
+                        Train / Retrain
+                    </a>
+                    <a href="{{ url_for('export_all', format='csv') }}"
+                        class="text-green-600 hover:bg-green-50 px-3 py-2 rounded-md text-sm font-medium transition">
+                        Export CSV
+                    </a>
+                    <a href="{{ url_for('auth.logout') }}"
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow">
+                        Logout
+                    </a>
+                    {% else %}
+                    <a href="{{ url_for('auth.login') }}"
+                        class="text-green-600 hover:bg-green-50 px-3 py-2 rounded-md text-sm font-medium transition">
+                        Login
+                    </a>
+                    <a href="{{ url_for('auth.signup') }}"
+                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow">
+                        Sign Up
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages as Toast Notifications -->
+    <div id="flash-container" class="fixed top-4 right-4 space-y-3 z-50">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="flash-msg p-4 rounded-lg shadow-lg text-white animate-slide-in flex justify-between items-center
+            {% if category == 'success' %} bg-green-500 
+            {% elif category == 'danger' %} bg-red-500 
+            {% elif category == 'warning' %} bg-yellow-500 text-black
+            {% else %} bg-gray-700 {% endif %}">
+            <span>{{ message }}</span>
+            <button type="button" onclick="this.parentElement.remove()" class="ml-4 font-bold">✕</button>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-100 py-4 text-center text-gray-600 text-sm border-t">
+        &copy; {{ current_year|default(2025) }} Cattle Monitoring Platform
+    </footer>
+
+    <!-- Auto-remove flash messages after 4 seconds -->
+    <script>
+        document.querySelectorAll(".flash-msg").forEach(el => {
+            el.style.animation = "slideInRight 0.4s ease-out";
+            setTimeout(() => {
+                el.style.animation = "fadeOut 0.4s forwards";
+                setTimeout(() => el.remove(), 400);
+            }, 4000);
+        });
+    </script>
+</body>
+
+</html>

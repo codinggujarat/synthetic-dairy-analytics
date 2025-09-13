@@ -1,0 +1,177 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<!-- Header -->
+<header class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8 p-4 md:py-16 pt-32 relative">
+
+    <!-- Header Content -->
+    <div class="flex flex-col justify-center text-center md:text-left gap-6">
+        <h1 class="text-5xl md:text-6xl font-bold text-gray-800 header-title">
+            BOOST YOUR<br><span class="text-green-500">CATTLE MILK YIELD</span> EFFICIENCY
+        </h1>
+
+        <p class="text-gray-600 text-lg md:text-base header-subtitle">
+            Explore our innovative cattle milk yield projects to enhance dairy productivity, monitor livestock
+            health, and maximize profits with modern agricultural solutions.
+        </p>
+
+        <!-- Buttons -->
+        <div class="flex flex-col md:flex-row gap-4 w-full header-buttons">
+            <!-- Dashboard Button with Gradient -->
+            <a href="{{ url_for('index') }}"
+                class="flex-1 px-5 py-8 text-white bg-gradient-to-r from-[#8DC972] to-[#6BA84F] rounded-xl shadow text-center font-medium transition-transform duration-300 transform hover:scale-105">
+                Go to Dashboard
+            </a>
+
+            <!-- Retrain Models Button (Solid Color) -->
+            <a href="{{ url_for('train_manual') }}"
+                class="flex-1 px-5 py-8 text-white bg-[#8DC972] hover:bg-[#7BB861] rounded-xl shadow text-center font-medium transition-transform duration-300 transform hover:scale-105">
+                Retrain Models
+            </a>
+        </div>
+
+
+
+        <!-- Welcome Box -->
+        <div class="top-4 left-4 bg-white shadow-lg rounded-xl p-4 w-80 md:w-96 z-50 header-welcome">
+            <div class="text-gray-700 text-lg font-medium mb-2">
+                Welcome, {{ current_user.email.split('@')[0] if current_user.email else 'Farmer' }}!
+            </div>
+            <p class="text-gray-600 text-base mb-2">
+                You have <strong>{{ total_records }}</strong> animal records in the system.
+            </p>
+            {% if last_record %}
+            <div class="bg-green-50 border-l-4 border-green-400 p-2 rounded-md">
+                <p class="text-gray-700 text-sm">
+                    Last Prediction: <strong>{{ "%.2f"|format(last_record.predicted_milk_yield) }} L/day</strong><br>
+                    Condition: <strong>{{ last_record.predicted_disease }}</strong>
+                </p>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="text-gray-400 text-sm mt-4 header-footer">&copy; 2025 Cattle Milk Yield Projects. All rights
+            reserved.</div>
+    </div>
+
+    <!-- Header Image & Cards -->
+    <div class="relative flex justify-center items-center header-image">
+        <img src="/static/img/cowhero.png" alt="Cattle Milk Yield" class="max-w-md mx-auto relative z-0" />
+
+        <!-- Cards -->
+        <div
+            class="absolute top-1/4 left-0 transform -translate-x-1/2 bg-white shadow-lg rounded-md px-4 py-2 flex items-center gap-2 text-gray-800 card">
+            <span class="text-green-500 text-xl"><i class="ri-key-line"></i></span> Livestock Monitoring
+        </div>
+        <div
+            class="absolute top-1/10 right-1 bg-white shadow-lg rounded-md px-4 py-2 flex items-center gap-2 text-gray-800 card">
+            <span class="text-green-500 text-xl"><i class="ri-passport-line"></i></span> Dairy Production Analysis
+        </div>
+        <div
+            class="absolute top-5/5 left-0 transform -translate-x-1/2 bg-white shadow-lg rounded-md px-4 py-2 flex items-center gap-2 text-gray-800 card">
+            <span class="text-green-500 text-xl"><i class="ri-map-2-line"></i></span> Farm Visits
+        </div>
+        <div
+            class="absolute bottom-10 right-0 bg-white shadow-lg rounded-md px-4 py-2 flex items-center gap-2 text-gray-800 card">
+            <span class="text-green-500 text-xl"><i class="ri-guide-line"></i></span> Expert Consultation
+        </div>
+    </div>
+</header>
+
+<section class="w-full py-12 px-6 md:px-12 lg:px-24">
+    <div class="text-center max-w-3xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-green-600 mb-4">
+            Smart Features for Modern Farming
+        </h2>
+        <p class="text-gray-600 text-lg">
+            Harness the power of AI and machine learning to revolutionize your dairy operations
+        </p>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+
+        <!-- Card 1 -->
+        <div class="bg-white rounded-2xl shadow p-6 hover:shadow-lg transform transition duration-300 hover:scale-105">
+            <div class="text-white   text-4xl mb-3 ">
+                <i
+                    class='bx bx-line-chart rounded-2xl bg-[#8DC972] border border-1 p-2 hover:shadow-lg transform transition duration-300 hover:scale-105'></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Milk Yield Prediction</h3>
+            <p class="text-gray-600">
+                AI-powered forecasting of daily milk production with 95% accuracy using advanced ML algorithms.
+            </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="bg-white rounded-2xl shadow p-6 hover:shadow-lg transform transition duration-300 hover:scale-105">
+            <div class="text-white text-4xl mb-3 ">
+                <i
+                    class='bx bx-heart rounded-2xl bg-[#8DC972] border border-1 p-2 hover:shadow-lg transform transition duration-300 hover:scale-105'></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Health Monitoring</h3>
+            <p class="text-gray-600">
+                Real-time cattle health assessment and early disease detection through behavioral analysis.
+            </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="bg-white rounded-2xl shadow p-6 hover:shadow-lg transform transition duration-300 hover:scale-105">
+            <div class="text-white text-4xl mb-3">
+                <i
+                    class='bx bx-bowl-rice rounded-2xl bg-[#8DC972] border border-1 p-2 hover:shadow-lg transform transition duration-300 hover:scale-105'></i>
+            </div>
+            <h3 class="text-xl font-semibold mb-2">Feed Optimization</h3>
+            <p class="text-gray-600">
+                Smart feed recommendations to maximize nutrition efficiency and reduce costs by up to 20%.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="w-full bg-gradient-to-r from-[#8DC972] to-[#8DC972]-900 py-16 px-6 text-center">
+    <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
+        Ready to Transform Your Dairy Farm?
+    </h2>
+    <p class="text-gray-700 max-w-2xl mx-auto mb-8">
+        Join hundreds of smart farmers already using AI to boost their milk production and cattle health.
+    </p>
+
+    <div class="flex justify-center gap-4 flex-wrap">
+        {% if current_user.is_authenticated %}
+        <!-- Logout Button -->
+        <a href="{{ url_for('auth.logout') }}" style="display: none;"
+            class="bg-white border border-green-400 text-green-600 font-medium px-6 py-3 rounded-xl shadow hover:bg-green-50 transition flex items-center gap-2">
+
+        </a>
+        {% else %}
+        <!-- Login Button -->
+        <a href="{{ url_for('auth.login') }}"
+            class="bg-white border border-green-400 text-green-600 font-medium px-6 py-3 rounded-xl shadow hover:bg-green-50 transition flex items-center gap-2">
+            Login
+        </a>
+        <!-- Sign Up Button -->
+        <a href="{{ url_for('auth.signup') }}"
+            class="bg-white border border-green-400 text-green-600 font-medium px-6 py-3 rounded-xl shadow hover:bg-green-50 transition flex items-center gap-2">
+            Sign Up
+        </a>
+        {% endif %}
+    </div>
+</section>
+
+
+<!-- ScrollReveal Animation -->
+<script src="https://unpkg.com/scrollreveal"></script>
+<script>
+    ScrollReveal().reveal(".header-title", { distance: "50px", origin: "bottom", duration: 1000 });
+    ScrollReveal().reveal(".header-subtitle", { distance: "50px", origin: "bottom", duration: 1000, delay: 300 });
+    ScrollReveal().reveal(".header-buttons a", { distance: "20px", origin: "bottom", duration: 800, interval: 200, delay: 600 });
+    ScrollReveal().reveal(".header-welcome", { distance: "50px", origin: "left", duration: 1000, delay: 900 });
+    ScrollReveal().reveal(".header-footer", { distance: "50px", origin: "bottom", duration: 1000, delay: 1200 });
+    ScrollReveal().reveal(".header-image img", { distance: "50px", origin: "right", duration: 1000, delay: 500 });
+    ScrollReveal().reveal(".card", { distance: "20px", origin: "bottom", duration: 800, interval: 300, delay: 1000 });
+</script>
+
+{% endblock %}

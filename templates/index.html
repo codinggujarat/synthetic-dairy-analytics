@@ -1,0 +1,817 @@
+<!-- templates/index.html -->
+{% extends "layout.html" %}
+{% block content %}
+<div class="min-h-screen bg-gray-50 flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow rounded-r-2xl p-6 space-y-6">
+        <nav class="space-y-4">
+            <!-- Train / Retrain Models -->
+            <a href="{{ url_for('train_manual') }}"
+                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
+                <i class='bx bx-cog text-xl'></i> Train / Retrain Models
+            </a>
+
+            <!-- Export Report CSV -->
+            <a href="{{ url_for('generate_report', format='csv') }}"
+                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
+                <i class='bx bx-spreadsheet text-xl'></i> Export Report (CSV)
+            </a>
+
+            <!-- Export Report PDF -->
+            <a href="{{ url_for('generate_report', format='pdf') }}"
+                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
+                <i class='bx bxs-file-pdf text-xl'></i> Export Report (PDF)
+            </a>
+            <button onclick="document.getElementById('formModal').classList.remove('hidden')"
+                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
+                <i class='bx bx-plus-circle text-xl'></i> Add New Record
+            </button>
+
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 p-6 md:p-10">
+        <!-- Top Stats -->
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <!-- Total Animals -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-gray-500">Total Animals</h3>
+                <p class="text-3xl font-bold text-green-600">{{ total_animals }}</p>
+                <p class="text-sm text-green-600"><i class='bx bx-trending-up'></i> Active</p>
+            </div>
+
+            <!-- Milk Yield -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-gray-500">Average Milk Yield</h3>
+                <p class="text-3xl font-bold text-blue-600">{{ avg_milk_yield }} L/day</p>
+            </div>
+
+            <!-- Healthy Animals -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-gray-500">Healthy Animals</h3>
+                <p class="text-3xl font-bold text-green-600">{{ health_score }}</p>
+            </div>
+
+            <!-- Unhealthy Animals -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-gray-500">Unhealthy Animals</h3>
+                <p class="text-3xl font-bold text-red-600">{{ unhealthy_animals }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Feed Efficiency -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-gray-500">Feed Efficiency</h3>
+                <p class="text-3xl font-bold text-rose-600 mt-1">
+                    {{ feed_efficiency }} <span class="text-base text-gray-500">L/kg</span>
+                </p>
+            </div>
+
+            <!-- Avg Weight -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-gray-500">Avg Weight</h3>
+                <p class="text-2xl font-bold text-gray-700">{{ avg_weight }} kg</p>
+            </div>
+
+            <!-- Vaccination Rate -->
+            <div class="bg-white rounded-xl shadow p-6">
+                <h3 class="text-gray-500">Vaccination Rate</h3>
+                <p class="text-2xl font-bold text-green-500">{{ vaccination_rate }}%</p>
+            </div>
+        </div>
+
+
+        <!-- AI Assistant Section -->
+        <div class="bg-white rounded-2xl shadow p-6 text-center">
+
+            <!-- Button Container -->
+            <div class="flex flex-wrap items-center justify-center gap-4 mt-6 mb-5">
+                <!-- AI Insights Button -->
+                <button onclick="document.getElementById('aiInsightsModal').classList.remove('hidden')"
+                    class="bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounded-full font-medium flex items-center justify-center gap-2 shadow transition">
+                    <i class="bx bx-pulse"></i> View AI Insights
+                </button>
+
+                <!-- Recent Predictions Button -->
+                <button onclick="document.getElementById('recentPredModal').classList.remove('hidden')"
+                    class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-6 py-2 rounded-full font-medium flex items-center justify-center gap-2 shadow transition">
+                    <i class="bx bx-table"></i> View Recent Predictions
+                </button>
+            </div>
+
+            <!-- Clickable Div to Open Chatbot -->
+            <div onclick="openChatbot()"
+                class="relative w-full h-64 rounded-xl overflow-hidden cursor-pointer hover:shadow-lg transition">
+
+                <!-- Background Image -->
+                <div
+                    class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1598515214211-5af6adbc66e5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80')] bg-cover bg-center">
+                </div>
+
+                <!-- Overlay (optional for readability) -->
+                <div class="absolute inset-0 bg-black bg-opacity-30"></div>
+
+                <!-- Clickable Div to Open Chatbot -->
+                <div onclick="toggleChatbot()"
+                    class="relative w-full h-64 rounded-xl overflow-hidden cursor-pointer group transition">
+
+                    <!-- Full Background Image -->
+                    <img src="/static/img/CHATBOTBG.jpg" alt="Cow Background"
+                        class="absolute inset-0 w-full h-full object-cover transition duration-300 group-hover:blur-sm">
+
+                    <!-- Overlay for readability -->
+                    <div
+                        class="absolute inset-0 bg-black bg-opacity-30 transition duration-300 group-hover:bg-opacity-50">
+                    </div>
+
+                    <!-- Centered Content -->
+                    <div
+                        class="relative z-10 flex flex-col items-center justify-center h-full text-center text-white px-4 transition">
+                        <h3 class="text-2xl font-bold drop-shadow-lg">
+                            Interactive Farm Assistant
+                        </h3>
+                        <p class="text-sm opacity-90 drop-shadow">
+                            Meet your AI-powered dairy companion
+                        </p>
+
+                        <!-- Extra Text on Hover -->
+                        <p class="text-base font-medium opacity-0 group-hover:opacity-100 transition duration-300 mt-2">
+                            💬 Ask the chatbot something!
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+
+        </div>
+    </main>
+</div>
+
+<!-- Boxicons CDN -->
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+<!-- Full-screen Chatbot Popup -->
+<!-- Full-screen Chatbot Popup -->
+<div id="chatbotBox" class="hidden fixed inset-0 z-50">
+    <!-- Dimmed backdrop -->
+    <div class="absolute inset-0 bg-black bg-opacity-60" onclick="closeChatbot()"></div>
+
+    <!-- Centered full-screen panel -->
+    <div
+        class="relative mx-auto my-6 w-full max-w-4xl h-[90vh] bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b">
+            <div class="flex items-center gap-3">
+                <i class="bx bx-bot text-2xl text-green-600"></i>
+                <div>
+                    <h3 class="text-lg font-semibold">Farm Chatbot</h3>
+                    <p class="text-xs text-gray-500">Ask anything about your cattle dataset</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button title="Close (Esc)" onclick="closeChatbot()"
+                    class="text-gray-500 hover:text-red-600 p-2 rounded-md">
+                    <i class="bx bx-x text-2xl"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat content (scrollable) -->
+        <div id="chatWindow" class="flex-1 p-4 overflow-y-auto space-y-3 bg-gray-50">
+            <div class="text-center text-sm text-gray-400">Ask me about animals, milk yield, breeds, feed efficiency...
+            </div>
+        </div>
+
+        <!-- Input area -->
+        <div class="p-4 border-t bg-white">
+            <form id="chatForm" class="flex gap-3" onsubmit="event.preventDefault(); sendMessage()">
+                <input id="chatInput" type="text" autocomplete="off" placeholder="Type your question and press Enter..."
+                    class="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-200" />
+                <button type="button" onclick="sendMessage()"
+                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openChatbot() {
+        document.getElementById('chatbotBox').classList.remove('hidden');
+        document.getElementById('chatInput').focus();
+    }
+    function closeChatbot() {
+        document.getElementById('chatbotBox').classList.add('hidden');
+    }
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeChatbot(); });
+
+    function appendMessage(text, side = 'bot', id = null) {
+        const chatWindow = document.getElementById('chatWindow');
+        const wrapper = document.createElement('div');
+        wrapper.className = side === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+        const bubble = document.createElement('div');
+        bubble.className = side === 'user'
+            ? 'bg-green-100 text-gray-800 px-3 py-2 rounded-lg max-w-[80%] text-sm'
+            : 'bg-white text-gray-800 px-3 py-2 rounded-lg shadow max-w-[80%] text-sm';
+        bubble.innerHTML = text;
+        if (id) bubble.id = id;
+
+        wrapper.appendChild(bubble);
+        chatWindow.appendChild(wrapper);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return bubble;
+    }
+
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    let sending = false;
+    async function sendMessage() {
+        if (sending) return;
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (!text) return;
+
+        appendMessage(`<strong>You:</strong> ${escapeHtml(text)}`, 'user');
+        input.value = "";
+        input.focus();
+
+        // Create unique loading bubble
+        const loadingId = 'loading_' + Date.now();
+        appendMessage(`<em>🤔 Thinking...</em>`, 'bot', loadingId);
+
+        // Animate "thinking..."
+        let dots = 0;
+        const interval = setInterval(() => {
+            const bubble = document.getElementById(loadingId);
+            if (!bubble) return clearInterval(interval);
+            bubble.innerHTML = `<em>🤔 Thinking${'.'.repeat(dots % 4)}</em>`;
+            dots++;
+        }, 500);
+
+        sending = true;
+        try {
+            const res = await fetch("/chatbot", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await res.json();
+            clearInterval(interval);
+            document.getElementById(loadingId).innerHTML = `<strong>Bot:</strong> ${escapeHtml(data.response)}`;
+        } catch (err) {
+            clearInterval(interval);
+            document.getElementById(loadingId).innerHTML = `<strong>Bot:</strong> Error contacting server.`;
+            console.error(err);
+        } finally {
+            sending = false;
+            const chatWindow = document.getElementById('chatWindow');
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+    }
+
+    document.getElementById('chatInput').addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+</script>
+
+
+<script>
+    function toggleChatbot() {
+        document.getElementById('chatbotBox').classList.toggle('hidden');
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('chatInput');
+        const chatWindow = document.getElementById('chatWindow');
+        const message = input.value.trim();
+        if (!message) return;
+
+        // Show user message
+        chatWindow.innerHTML += `<div class="text-right"><span class="bg-green-100 px-2 py-1 rounded-lg">${message}</span></div>`;
+        input.value = "";
+
+        // Send message to backend
+        const res = await fetch("/chatbot", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+
+        // Show bot response
+        chatWindow.innerHTML += `<div class="text-left"><span class="bg-gray-100 px-2 py-1 rounded-lg">${data.response}</span></div>`;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+</script>
+
+<!-- Modal Background -->
+<div id="formModal" class="hidden fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+    <div class="bg-white rounded-2xl shadow-lg w-[90%] md:w-[1200px] max-h-[90vh] overflow-y-auto relative">
+
+        <!-- Close Button -->
+        <button onclick="document.getElementById('formModal').classList.add('hidden')"
+            class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-xl font-bold">
+            ✖
+        </button>
+
+        <!-- Your Existing Form -->
+        <div class="p-6">
+            <h3 class="text-xl font-bold mb-4">Input Animal & Environment Data</h3>
+
+            <!-- Paste your <form> ... </form> here exactly as it is -->
+            <form method="post" action="{{ url_for('predict_route') }}"
+                class="grid grid-cols-4 gap-4 bg-white p-6 rounded-2xl shadow">
+
+                <!-- Breed -->
+                <div class="relative w-full col-span-1">
+                    <select name="breed" required
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                        <option value="" disabled selected hidden></option>
+                        <option>Holstein</option>
+                        <option>Jersey</option>
+                        <option>Brown Swiss</option>
+                        <option>Buffalo</option>
+                    </select>
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Breed
+                    </label>
+                </div>
+
+                <!-- Age -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="1" name="age" value="5" placeholder="Age"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Age (years)
+                    </label>
+                </div>
+
+                <!-- Weight -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="weight" value="550" placeholder="Weight"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Weight (kg)
+                    </label>
+                </div>
+
+                <!-- Lactation Stage -->
+                <div class="relative w-full col-span-1">
+                    <select name="lactation_stage"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                        <option value="" disabled selected hidden></option>
+                        <option>early</option>
+                        <option selected>mid</option>
+                        <option>late</option>
+                    </select>
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Lactation stage
+                    </label>
+                </div>
+
+                <!-- Parity -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="1" name="parity" value="2" placeholder="Parity"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Parity
+                    </label>
+                </div>
+
+                <!-- Historical Yield -->
+                <div class="relative w-full col-span-2">
+                    <input type="number" step="0.1" name="hist_yield_avg7" value="22.0" placeholder="Hist Yield"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Historical avg yield (L/day)
+                    </label>
+                </div>
+
+                <!-- Feed Type -->
+                <div class="relative w-full col-span-1">
+                    <select name="feed_type"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                        <option value="" disabled selected hidden></option>
+                        <option>green</option>
+                        <option>dry</option>
+                        <option>concentrate</option>
+                        <option selected>mixed</option>
+                    </select>
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Feed type
+                    </label>
+                </div>
+
+                <!-- Feed Quality -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="feed_quality" value="7.0" placeholder="Feed Quality"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Feed quality (1-10)
+                    </label>
+                </div>
+
+                <!-- Feed Quantity -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="feed_qty_kg" value="18.0" placeholder="Feed Qty"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Feed qty (kg/day)
+                    </label>
+                </div>
+
+                <!-- Walking -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="walking_km" value="2.0" placeholder="Walking"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Walking km/day
+                    </label>
+                </div>
+
+                <!-- Grazing -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="grazing_h" value="3.0" placeholder="Grazing"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Grazing hours
+                    </label>
+                </div>
+
+                <!-- Rumination -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="rumination_h" value="5.0" placeholder="Rumination"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Rumination hours
+                    </label>
+                </div>
+
+                <!-- Resting -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="resting_h" value="10.0" placeholder="Resting"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Resting hours
+                    </label>
+                </div>
+
+                <!-- Body Temperature -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="body_temp" value="38.5" placeholder="Body Temp"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Body temp (°C)
+                    </label>
+                </div>
+
+                <!-- Heart Rate -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="1" name="heart_rate" value="65" placeholder="Heart rate"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Heart rate (bpm)
+                    </label>
+                </div>
+
+                <!-- Ambient Temperature -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="ambient_temp" value="25.0" placeholder="Ambient Temp"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Ambient temp (°C)
+                    </label>
+                </div>
+
+                <!-- Humidity -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="humidity" value="60.0" placeholder="Humidity"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Humidity (%)
+                    </label>
+                </div>
+
+                <!-- Housing Score -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="0.1" name="housing_score" value="7.0" placeholder="Housing"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Housing score (1-10)
+                    </label>
+                </div>
+
+                <!-- Vaccinations -->
+                <div class="relative w-full col-span-1">
+                    <select name="vaccinations_up_to_date"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                        <option value="1" selected>Yes</option>
+                        <option value="0">No</option>
+                    </select>
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Vaccinations up-to-date
+                    </label>
+                </div>
+
+                <!-- Past Disease -->
+                <div class="relative w-full col-span-1">
+                    <input type="number" step="1" name="disease_history_count" value="0" placeholder="Past disease"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Past disease occurrences
+                    </label>
+                </div>
+
+                <!-- Season -->
+                <div class="relative w-full col-span-2">
+                    <select name="season"
+                        class="peer block w-full px-4 pt-6 pb-2 placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-500 focus:ring-0 focus:outline-none">
+                        <option value="" disabled selected hidden></option>
+                        <option>spring</option>
+                        <option>summer</option>
+                        <option selected>autumn</option>
+                        <option>winter</option>
+                    </select>
+                    <label class="absolute left-4 top-2 text-gray-500 text-sm uppercase transition-all duration-200 ease-in-out
+                peer-placeholder-shown:top-6 peer-placeholder-shown:text-gray-400 peer-placeholder-shown:text-base
+                peer-focus:top-2 peer-focus:text-sm peer-focus:text-green-500">
+                        Season
+                    </label>
+                </div>
+
+                <!-- Buttons -->
+                <div class="col-span-4 grid grid-cols-4 gap-4 pt-4">
+                    <button type="submit"
+                        class="inline-flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition text-white font-medium px-5 py-2 rounded-xl shadow focus:outline-none focus:ring-2 focus:ring-green-300">
+                        <!-- Cow SVG -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"
+                            class="w-5 h-5">
+                            <path d="M18 8c0 2-1.5 3-3 3s-3-1-3-3 1-3 3-3 3 1 3 3z" />
+                            <path d="M9 9c0-1.5-1.5-3-3-3S3 7.5 3 9c0 1 .5 2 1.5 2.5C6 12.5 9 11 9 9z" />
+                            <path d="M6 13c0 2 2 4 6 4s6-2 6-4v-1" />
+                            <path d="M8 17v3" />
+                            <path d="M16 17v3" />
+                            <path d="M20 13c0 .8-.7 1.5-1.5 1" />
+                        </svg>
+                        <span>Predict</span>
+                    </button>
+
+
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+<!-- Modal -->
+<div id="recentPredModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white w-full max-w-4xl rounded-2xl shadow-lg p-6 relative overflow-y-auto max-h-[90vh]">
+        <!-- Close Button -->
+        <button onclick="document.getElementById('recentPredModal').classList.add('hidden')"
+            class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl">
+            &times;
+        </button>
+
+        <h3 class="text-2xl font-bold mb-4 text-center">Recent Predictions</h3>
+
+        {% if records|length == 0 %}
+        <p class="text-gray-500 text-center">No records yet. After you run a prediction, recent records will appear
+            here.</p>
+        {% else %}
+        <div class="overflow-x-auto">
+            <table id="predictionsTable" class="min-w-full text-sm border border-gray-200 rounded-lg">
+                <thead class="bg-gray-100 font-medium text-gray-700 uppercase">
+                    <tr>
+                        <th class="px-3 py-2 text-left">ID</th>
+                        <th class="px-3 py-2 text-left">Breed</th>
+                        <th class="px-3 py-2 text-left">Predicted L/day</th>
+                        <th class="px-3 py-2 text-left">Top Condition</th>
+                        <th class="px-3 py-2 text-left">Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in records %}
+                    <tr class="hover:bg-gray-50 border-b">
+                        <td class="px-3 py-2">{{ r.id }}</td>
+                        <td class="px-3 py-2">{{ r.breed }}</td>
+                        <td class="px-3 py-2">{{ '%.2f'|format(r.predicted_milk_yield) }}</td>
+                        <td class="px-3 py-2">{{ r.predicted_disease }}</td>
+                        <td class="px-3 py-2">{{ r.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('#predictionsTable').DataTable({
+            pageLength: 10,
+            order: [[4, "desc"]], // default sort by Time descending
+            columnDefs: [
+                { targets: [4], type: 'date' } // Time column as date
+            ]
+        });
+    });
+</script>
+
+
+
+
+<!-- Modal chart -->
+<div id="aiInsightsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+    <div class="bg-white w-full max-w-5xl rounded-2xl shadow-lg p-6 relative overflow-y-auto max-h-[90vh]">
+        <!-- Close Button -->
+        <button onclick="document.getElementById('aiInsightsModal').classList.add('hidden')"
+            class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl">
+            &times;
+        </button>
+
+        <h3 class="text-2xl font-bold mb-4 text-center">AI Insights</h3>
+
+        <!-- Your Chart Content -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% if plot_data %}
+            <div class="bg-white rounded-xl shadow p-4">
+                <h5 class="text-lg font-semibold mb-2">Last prediction vs historical</h5>
+                <canvas id="histPredChart" style="height:250px;"></canvas>
+
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <script>
+                    try {
+                        const ctx = document.getElementById('histPredChart');
+                        const plotData = {{ plot_data | tojson | safe
+                    }};
+                    const labels = ['Historical Avg', 'Predicted'];
+                    const dataValues = [plotData.historical || 0, plotData.predicted || 0];
+
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Milk Yield (L/day)',
+                                data: dataValues,
+                                backgroundColor: ['#3B82F6', '#10B981'],
+                                borderWidth: 1
+                            }]
+                        },
+                        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                    });
+                    } catch (err) {
+                        console.error('Error rendering historical vs predicted chart:', err);
+                    }
+                </script>
+            </div>
+            {% endif %}
+
+            {% if shap_values %}
+            <div class="bg-white rounded-xl shadow p-4">
+                <h5 class="text-lg font-semibold mb-2">Feature Contribution (Top 5)</h5>
+                <canvas id="shapChart" style="height:250px;"></canvas>
+                <script>
+                    try {
+                        const ctx = document.getElementById('shapChart');
+                        const shapData = {{ shap_values | tojson | safe
+                    }};
+
+                    if (Array.isArray(shapData) && shapData.length > 0) {
+                        const shapLabels = shapData.slice(0, 5).map(item => item[0]);
+                        const shapScores = shapData.slice(0, 5).map(item => item[1]);
+
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: shapLabels,
+                                datasets: [{
+                                    label: 'SHAP Impact',
+                                    data: shapScores,
+                                    backgroundColor: 'rgba(34,197,94,0.6)',
+                                    borderWidth: 1
+                                }]
+                            },
+                            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                        });
+                    }
+                    } catch (err) {
+                        console.error('Error rendering SHAP chart:', err);
+                    }
+                </script>
+            </div>
+            {% endif %}
+
+            {% if records|length > 0 %}
+            <div class="bg-white rounded-xl shadow p-4">
+                <h5 class="text-lg font-semibold mb-2">Breed Distribution</h5>
+                <canvas id="breedChart"></canvas>
+            </div>
+
+            <div class="bg-white rounded-xl shadow p-4">
+                <h5 class="text-lg font-semibold mb-2">Predicted Disease Distribution</h5>
+                <canvas id="diseaseChart"></canvas>
+            </div>
+
+            <script>
+                const recordsData = {{ records_json | tojson }};
+                const breedCounts = {};
+                const diseaseCounts = {};
+
+                recordsData.forEach(r => {
+                    breedCounts[r.breed] = (breedCounts[r.breed] || 0) + 1;
+                    diseaseCounts[r.predicted_disease] = (diseaseCounts[r.predicted_disease] || 0) + 1;
+                });
+
+                new Chart(document.getElementById('breedChart'), {
+                    type: 'pie',
+                    data: {
+                        labels: Object.keys(breedCounts),
+                        datasets: [{
+                            data: Object.values(breedCounts),
+                            backgroundColor: ['#3B82F6', '#F59E0B', '#10B981', '#EF4444']
+                        }]
+                    }
+                });
+
+                new Chart(document.getElementById('diseaseChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(diseaseCounts),
+                        datasets: [{
+                            data: Object.values(diseaseCounts),
+                            backgroundColor: 'rgba(239,68,68,0.6)',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: { indexAxis: 'y', responsive: true, scales: { x: { beginAtZero: true } } }
+                });
+            </script>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
