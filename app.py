@@ -225,6 +225,7 @@ def index():
     total_animals = avg_milk_yield = healthy_animals = unhealthy_animals = 0
     feed_efficiency = avg_weight = avg_temp = avg_heart_rate = vaccination_rate = 0
     breed_counts = {}
+    health_score = 0
 
     try:
         data_path = os.path.join(basedir, "data", "cattle_synthetic.csv")
@@ -234,20 +235,26 @@ def index():
             if not df.empty:
                 total_animals = len(df)
                 avg_milk_yield = round(df["milk_yield"].mean(), 2)
-                healthy_animals = len(df[df["disease_label"] == 0])
-                health_score = len(df[df["health_score"] == 0])
-                unhealthy_animals = len(df[df["disease_label"] == 1])
-                feed_efficiency = round(df["milk_yield"].sum() / df["feed_qty_kg"].sum(), 2)  # L/kg
-                avg_weight = round(df["weight"].mean(), 2)
-                # Optional: handle missing body_temp or heart_rate columns
+                # Convert disease_label to string and lowercase
+                df['disease_label'] = df['disease_label'].astype(str).str.strip().str.lower()
+                healthy_animals = len(df[df["disease_label"] == "healthy"])
+                unhealthy_animals = total_animals - healthy_animals
+
+                # Health score
+                if "health_score" in df.columns:
+                    health_score = round(df["health_score"].mean(), 2)
+
+                feed_efficiency = round(df["milk_yield"].sum() / df["feed_qty_kg"].sum(), 2) if "feed_qty_kg" in df.columns else 0
+                avg_weight = round(df["weight"].mean(), 2) if "weight" in df.columns else 0
                 avg_temp = round(df["body_temp"].mean(), 2) if "body_temp" in df.columns else 0
                 avg_heart_rate = round(df["heart_rate"].mean(), 2) if "heart_rate" in df.columns else 0
                 vaccination_rate = round(df["vaccinations_up_to_date"].mean() * 100, 2) if "vaccinations_up_to_date" in df.columns else 0
-                breed_counts = df["breed"].value_counts().to_dict()
+                breed_counts = df["breed"].value_counts().to_dict() if "breed" in df.columns else {}
         else:
             flash("No CSV found at data/cattle_synthetic.csv.", "warning")
 
     except Exception as e:
+        import traceback
         traceback.print_exc()
         flash(f"Failed to load CSV: {e}", "danger")
 
@@ -455,7 +462,8 @@ def predict_route():
 
     # --- Append to CSV file ---
     try:
-        csv_path = os.path.join(app.static_folder, 'cattle_synthetic.csv')
+        csv_path = os.path.join(basedir, "data", "cattle_synthetic.csv")
+        os.makedirs(os.path.dirname(csv_path), exist_ok=True)
         data_to_save = data.copy()
         data_to_save['milk_yield'] = milk_pred
         data_to_save['disease_label'] = top_class

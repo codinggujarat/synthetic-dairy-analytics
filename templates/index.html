@@ -44,13 +44,6 @@
         <!-- Top Stats -->
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-<p id="animalCounter" class="text-2xl font-bold text-gray-800">{{ total_animals }}+</p>
-<p id="milkCounter" class="text-2xl font-bold text-blue-600">{{ avg_milk }}+</p>
-<p id="healthyCounter" class="text-2xl font-bold text-green-600">{{ healthy_count }}+</p>
-<p id="unhealthyCounter" class="text-2xl font-bold text-red-600">{{ unhealthy_count }}+</p>
-<p id="feedCounter" class="text-2xl font-bold text-rose-600">{{ feed_efficiency }}+</p>
-<p id="weightCounter" class="text-2xl font-bold text-gray-700">{{ avg_weight }}+</p>
-<p id="vaccineCounter" class="text-2xl font-bold text-green-500">{{ vaccination_rate }}+</p>
 
             <!-- Total Animals -->
             <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
@@ -216,13 +209,14 @@
                 const timer = setInterval(() => {
                     start += increment;
                     if (start >= target) {
-                        counter.textContent = target + "+";
+                        counter.textContent = target; // removed "+"
                         clearInterval(timer);
                     } else {
-                        counter.textContent = Math.floor(start) + "+";
+                        counter.textContent = Math.floor(start); // removed "+"
                     }
                 }, 16);
             }
+
 
             document.addEventListener("DOMContentLoaded", () => {
                 animateCounter("animalCounter", {{ total_animals }});
