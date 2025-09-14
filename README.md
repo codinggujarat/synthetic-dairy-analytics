@@ -123,22 +123,61 @@ Navigate to [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
 ```
 CattleCare-AI/
-├── app.py               # Main Flask app
-├── test.py              # Testing API/chatbot functionality
-├── templates/
-│   └── index.html       # Frontend HTML
-├── static/
-│   ├── css/             # Tailwind CSS files
-│   ├── js/              # Optional JS files
-│   └── images/          # Icons or media
-├── models/
-│   ├── regressor.joblib
-│   ├── classifier.joblib
-│   └── preprocessor.joblib
-├── data/
-│   └── cattle_synthetic.csv
-├── requirements.txt
-└── README.md
+├── app.py                        # Main Flask app
+├── auth.py                       # Authentication logic
+├── test.py                       # Testing APIs / chatbot functionality
+│
+├── templates/                    # Frontend HTML templates
+│   └── index.html
+│
+├── static/                       # Frontend assets
+│   ├── css/                      # Tailwind CSS / styles
+│   ├── js/                       # JavaScript files
+│   ├── img/                      # Images, icons
+│   └── mp3/                      # Audio files (alerts/notifications)
+│
+├── models/                       # Trained ML models
+│   ├── classifier.pkl
+│   ├── classifier_joblib.pkl
+│   ├── label_encoder.pkl
+│   ├── labelencoder_joblib.pkl
+│   ├── preprocessor.pkl
+│   ├── preprocessor_joblib.pkl
+│   ├── regressor.pkl
+│   ├── regressor_joblib.pkl
+│   ├── anomaly_model.pkl
+│   └── mappings.pkl
+│
+├── data/                         # Datasets
+│   ├── cattle_synthetic.csv
+│   ├── login_data.csv
+│   └── login_with_anomalies.csv
+│
+├── instance/                     # App/database instance
+│   └── app.db
+│
+├── database/                     # (optional extra DB location if scaling)
+│   └── users.db
+│
+├── scripts/                      # Utility scripts
+│   ├── data_generator.py         # Generate cattle data
+│   ├── synthetic_data.py         # Synthetic dataset generator
+│   ├── simulate_stream.py        # Streaming simulation
+│   ├── features.py               # Feature extraction
+│   └── train_model.py            # Train ML models
+│
+├── deployment/                   # Deployment & configs
+│   ├── Dockerfile
+│   ├── docker-compose.yml
+│   └── .env
+│
+├── tests/                        # Unit & integration tests
+│   └── test_api.py
+│
+├── requirements.txt              # Python dependencies
+├── README.md                     # Documentation
+├── LICENSE                       # License file
+└── .gitignore                    # Git ignore rules
 ```
 
 ---
