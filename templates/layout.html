@@ -62,17 +62,17 @@
 
                     <!-- Logo -->
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 rounded-md bg-[#8DC972] flex items-center justify-center">
-                            <img src="{{ url_for('static', filename='img/cowhero.png') }}" alt="Logo"
+                        <div class="w-10 h-10 rounded-md bg-[#fff] flex items-center justify-center">
+                            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo"
                                 class="h-50 w-auto">
                             <i class="fas fa-wave-square text-white text-lg"></i>
                         </div>
                         <div>
-                            <h1 class="text-lg font-semibold">
-                                <span class="text-[#6BAE55]">SmartDairy</span>
+                            <h1 class="text-lg font-bold">
+                                <span class="text-green-500 uppercase ">CattleCare</span>
                                 <span class="text-[#6CB7D8]">AI</span>
                             </h1>
-                            <p class="text-sm text-gray-500 -mt-1">AI-Powered Dairy Management</p>
+                            <p class="text-sm text-gray-500 -mt-1">AI-Powered Farm Insights</p>
                         </div>
                     </div>
                 </a>
@@ -82,24 +82,24 @@
                 <div class="flex items-center space-x-4">
                     {% if current_user.is_authenticated %}
                     <a href="{{ url_for('train_manual') }}"
-                        class="text-green-600 hover:bg-green-50 px-3 py-2 rounded-md text-sm font-medium transition">
+                        class="text-green-600 hover:bg-green-50 px-3 uppercase py-2 rounded-md text-sm font-bold transition">
                         Train / Retrain
                     </a>
                     <a href="{{ url_for('export_all', format='csv') }}"
-                        class="text-green-600 hover:bg-green-50 px-3 py-2 rounded-md text-sm font-medium transition">
+                        class="text-green-600 hover:bg-green-50 px-3 py-2 uppercase rounded-md text-sm font-bold transition">
                         Export CSV
                     </a>
                     <a href="{{ url_for('auth.logout') }}"
-                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow">
+                        class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 uppercase rounded-lg text-sm font-bold transition shadow">
                         Logout
                     </a>
                     {% else %}
                     <a href="{{ url_for('auth.login') }}"
-                        class="text-green-600 hover:bg-green-50 px-3 py-2 rounded-md text-sm font-medium transition">
+                        class="text-green-600 hover:bg-green-50 px-3 py-2 uppercase rounded-md text-sm font-bold transition">
                         Login
                     </a>
                     <a href="{{ url_for('auth.signup') }}"
-                        class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow">
+                        class="bg-green-600 hover:bg-green-700 text-white uppercase px-4 py-2 rounded-lg text-sm font-bold transition shadow">
                         Sign Up
                     </a>
                     {% endif %}

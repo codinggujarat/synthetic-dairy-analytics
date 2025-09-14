@@ -1,30 +1,39 @@
 <!-- templates/index.html -->
 {% extends "layout.html" %}
 {% block content %}
+
 <div class="min-h-screen bg-gray-50 flex">
+
     <!-- Sidebar -->
-    <aside class="w-64 bg-white shadow rounded-r-2xl p-6 space-y-6">
-        <nav class="space-y-4">
-            <!-- Train / Retrain Models -->
-            <a href="{{ url_for('train_manual') }}"
-                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
-                <i class='bx bx-cog text-xl'></i> Train / Retrain Models
-            </a>
+    <aside class="w-100 bg-white shadow rounded-r-2xl p-10 m-5 space-y-7">
+        <!-- Sidebar Title -->
+        <div class="text-center border-b pb-4">
+            <div class="flex justify-center mb-2">
+                <div class="bg-green-100 text-green-700 w-12 h-12 flex items-center justify-center rounded-xl shadow">
+                    <i class="bx bx-stats text-2xl"></i>
+                </div>
+            </div>
+            <h2 class="text-xl font-bold text-green-700 tracking-wide">Farm Dashboard</h2>
+            <p class="text-sm text-gray-500">Manage & Monitor</p>
+        </div>
 
-            <!-- Export Report CSV -->
-            <a href="{{ url_for('generate_report', format='csv') }}"
-                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
-                <i class='bx bx-spreadsheet text-xl'></i> Export Report (CSV)
-            </a>
-
-            <!-- Export Report PDF -->
-            <a href="{{ url_for('generate_report', format='pdf') }}"
-                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
-                <i class='bx bxs-file-pdf text-xl'></i> Export Report (PDF)
-            </a>
+        <nav class="space-y-5">
+            <!-- Add New Record -->
             <button onclick="document.getElementById('formModal').classList.remove('hidden')"
-                class="flex items-center gap-3 text-gray-700 hover:text-green-600 font-medium">
+                class="w-full bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounded-full font-medium flex items-center gap-2 justify-start shadow transition">
                 <i class='bx bx-plus-circle text-xl'></i> Add New Record
+            </button>
+
+            <!-- AI Insights Button -->
+            <button onclick="document.getElementById('aiInsightsModal').classList.remove('hidden')"
+                class="w-full md:w-auto bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounded-full font-medium flex items-center justify-start gap-2 shadow transition">
+                <i class="bx bx-pulse text-xl"></i> View AI Insights
+            </button>
+
+            <!-- Recent Predictions Button -->
+            <button onclick="document.getElementById('recentPredModal').classList.remove('hidden')"
+                class="w-full md:w-auto bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounded-full font-medium flex items-center justify-start gap-2 shadow transition">
+                <i class="bx bx-table text-xl"></i> View Recent Predictions
             </button>
 
         </nav>
@@ -34,54 +43,190 @@
     <main class="flex-1 p-6 md:p-10">
         <!-- Top Stats -->
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
             <!-- Total Animals -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-gray-500">Total Animals</h3>
-                <p class="text-3xl font-bold text-green-600">{{ total_animals }}</p>
-                <p class="text-sm text-green-600"><i class='bx bx-trending-up'></i> Active</p>
+            <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+                <div
+                    class="bg-gradient-to-r from-green-400 to-green-600 text-white w-14 h-14 flex items-center justify-center rounded-lg shadow">
+                    <i class="bx bx-group text-2xl"></i>
+                </div>
+                <div class="text-right flex-1 ml-4">
+                    <p class="text-gray-500 text-sm font-medium">Total Animals</p>
+                    <p id="animalCounter" class="text-2xl font-bold text-gray-800">0+</p>
+                </div>
             </div>
 
-            <!-- Milk Yield -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-gray-500">Average Milk Yield</h3>
-                <p class="text-3xl font-bold text-blue-600">{{ avg_milk_yield }} L/day</p>
+            <!-- Average Milk Yield -->
+            <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+                <div
+                    class="bg-gradient-to-r from-blue-400 to-blue-600 text-white w-14 h-14 flex items-center justify-center rounded-lg shadow">
+                    <i class="bx bxs-drink text-2xl"></i>
+                </div>
+                <div class="text-right flex-1 ml-4">
+                    <p class="text-gray-500 text-sm font-medium">Average Milk Yield</p>
+                    <p id="milkYieldCounter" class="text-2xl font-bold text-blue-600">0+</p>
+                    <span class="text-gray-500 text-sm">L/day</span>
+                </div>
             </div>
 
             <!-- Healthy Animals -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-gray-500">Healthy Animals</h3>
-                <p class="text-3xl font-bold text-green-600">{{ health_score }}</p>
+            <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+                <div
+                    class="bg-gradient-to-r from-green-300 to-green-600 text-white w-14 h-14 flex items-center justify-center rounded-lg shadow">
+                    <i class="bx bx-smile text-2xl"></i>
+                </div>
+                <div class="text-right flex-1 ml-4">
+                    <p class="text-gray-500 text-sm font-medium">Healthy Animals</p>
+                    <p id="healthyCounter" class="text-2xl font-bold text-green-600">0+</p>
+                </div>
             </div>
 
             <!-- Unhealthy Animals -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-gray-500">Unhealthy Animals</h3>
-                <p class="text-3xl font-bold text-red-600">{{ unhealthy_animals }}</p>
+            <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+                <div
+                    class="bg-gradient-to-r from-red-400 to-red-600 text-white w-14 h-14 flex items-center justify-center rounded-lg shadow">
+                    <i class="bx bx-dizzy text-2xl"></i>
+                </div>
+                <div class="text-right flex-1 ml-4">
+                    <p class="text-gray-500 text-sm font-medium">Unhealthy Animals</p>
+                    <p id="unhealthyCounter" class="text-2xl font-bold text-red-600">0+</p>
+                </div>
             </div>
-        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Feed Efficiency -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-gray-500">Feed Efficiency</h3>
-                <p class="text-3xl font-bold text-rose-600 mt-1">
-                    {{ feed_efficiency }} <span class="text-base text-gray-500">L/kg</span>
-                </p>
+            <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+                <div
+                    class="bg-gradient-to-r from-rose-400 to-rose-600 text-white w-14 h-14 flex items-center justify-center rounded-lg shadow">
+                    <i class="bx bx-bowl-hot text-2xl"></i>
+                </div>
+                <div class="text-right flex-1 ml-4">
+                    <p class="text-gray-500 text-sm font-medium">Feed Efficiency</p>
+                    <p id="feedCounter" class="text-2xl font-bold text-rose-600">0+</p>
+                    <span class="text-gray-500 text-sm">L/kg</span>
+                </div>
             </div>
 
             <!-- Avg Weight -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-gray-500">Avg Weight</h3>
-                <p class="text-2xl font-bold text-gray-700">{{ avg_weight }} kg</p>
+            <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+                <div
+                    class="bg-gradient-to-r from-gray-500 to-gray-700 text-white w-14 h-14 flex items-center justify-center rounded-lg shadow">
+                    <i class="bx bx-dumbbell text-2xl"></i>
+                </div>
+                <div class="text-right flex-1 ml-4">
+                    <p class="text-gray-500 text-sm font-medium">Avg Weight</p>
+                    <p id="weightCounter" class="text-2xl font-bold text-gray-700">0+</p>
+                    <span class="text-gray-500 text-sm">kg</span>
+                </div>
             </div>
 
             <!-- Vaccination Rate -->
-            <div class="bg-white rounded-xl shadow p-6">
-                <h3 class="text-gray-500">Vaccination Rate</h3>
-                <p class="text-2xl font-bold text-green-500">{{ vaccination_rate }}%</p>
+            <div class="bg-white rounded-xl shadow p-5 flex items-center justify-between">
+                <div
+                    class="bg-gradient-to-r from-green-400 to-green-600 text-white w-14 h-14 flex items-center justify-center rounded-lg shadow">
+                    <i class="bx bx-injection text-2xl"></i>
+                </div>
+                <div class="text-right flex-1 ml-4">
+                    <p class="text-gray-500 text-sm font-medium">Vaccination Rate</p>
+                    <p id="vaccineCounter" class="text-2xl font-bold text-green-500">0+</p>
+                    <span class="text-gray-500 text-sm">%</span>
+                </div>
             </div>
+
         </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
+            {% if records_json %}
+            {% for record in records_json %}
+            {% set disease_probs = record.disease_probs or {} %}
+            {% set max_prob = disease_probs.get(record.predicted_disease, 0) %}
+            {% set risk = max_prob >= 0.7 %}
+
+            <div class="rounded-xl p-5 flex flex-col justify-between
+                  transition transform hover:scale-105
+                  {% if risk %}bg-red-50 border-2 border-red-500{% else %}bg-white shadow-lg{% endif %}">
+
+                <!-- Header -->
+                <h3 class="text-xl font-bold mb-3 text-gray-800 flex items-center gap-2">
+                    <i class='bx bx-cow text-green-600 text-2xl'></i>
+                    Cow ID: {{ record.id }}
+                </h3>
+
+                <!-- Cow Info -->
+                <div class="space-y-1 text-gray-700 text-sm">
+                    <div class="flex items-center gap-2"> <strong>Breed:</strong> {{
+                        record.breed }}
+                    </div>
+                    <div class="flex items-center gap-2"> <strong>Age:</strong> {{
+                        record.age }}
+                        yrs</div>
+                    <div class="flex items-center gap-2"> <strong>Weight:</strong> {{
+                        record.weight
+                        }} kg</div>
+                    <div class="flex items-center gap-2"> <strong>Lactation Stage:</strong>
+                        {{
+                        record.lactation_stage }}</div>
+                    <div class="flex items-center gap-2"><strong>Parity:</strong> {{
+                        record.parity
+                        }}</div>
+                    <div class="flex items-center gap-2"> <strong>Milk
+                            Yield:</strong> {{
+                        record.predicted_milk_yield }} L/day</div>
+                    <div class="flex items-center gap-2"> <strong>Health:</strong> {{
+                        record.predicted_disease }}</div>
+                </div>
+
+                <!-- Risk Status -->
+                {% if risk %}
+                <div class="mt-3 p-2 bg-red-200 text-red-900 font-semibold rounded flex items-center gap-2">
+                    <i class='bx bx-error-circle'></i>
+                    High Risk: {{ (max_prob*100)|round(1) }}% chance of {{ record.predicted_disease }}
+                </div>
+                {% else %}
+                <div class="mt-3 p-2 bg-green-100 text-green-900 font-semibold rounded flex items-center gap-2">
+                    <i class='bx bx-check-circle'></i>
+                    Low Risk
+                </div>
+                {% endif %}
+
+                <!-- Timestamp -->
+                <div class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <i class='bx bx-time'></i> Recorded at: {{ record.created_at }}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="col-span-full text-gray-500 text-center">No cow data available yet.</p>
+            {% endif %}
+        </div>
+
+
+        <!-- Counter Animation Script -->
+        <script>
+            function animateCounter(id, target, duration = 1500) {
+                const counter = document.getElementById(id);
+                let start = 0;
+                const increment = target / (duration / 16);
+                const timer = setInterval(() => {
+                    start += increment;
+                    if (start >= target) {
+                        counter.textContent = target + "+";
+                        clearInterval(timer);
+                    } else {
+                        counter.textContent = Math.floor(start) + "+";
+                    }
+                }, 16);
+            }
+
+            document.addEventListener("DOMContentLoaded", () => {
+                animateCounter("animalCounter", {{ total_animals }});
+            animateCounter("milkCounter", {{ avg_milk_yield }});
+            animateCounter("healthyCounter", {{ health_score }});
+            animateCounter("unhealthyCounter", {{ unhealthy_animals }});
+            animateCounter("feedCounter", {{ feed_efficiency }});
+            animateCounter("weightCounter", {{ avg_weight }});
+            animateCounter("vaccineCounter", {{ vaccination_rate }});
+    });
+        </script>
 
 
         <!-- AI Assistant Section -->
@@ -89,17 +234,23 @@
 
             <!-- Button Container -->
             <div class="flex flex-wrap items-center justify-center gap-4 mt-6 mb-5">
-                <!-- AI Insights Button -->
-                <button onclick="document.getElementById('aiInsightsModal').classList.remove('hidden')"
-                    class="bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounded-full font-medium flex items-center justify-center gap-2 shadow transition">
-                    <i class="bx bx-pulse"></i> View AI Insights
-                </button>
+                <!-- Train / Retrain Models -->
+                <a href="{{ url_for('train_manual') }}"
+                    class=" bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounde font-medium flex items-center gap-2 justify-start shadow transition">
+                    <i class='bx bx-cog text-xl'></i> Train / Retrain Models
+                </a>
 
-                <!-- Recent Predictions Button -->
-                <button onclick="document.getElementById('recentPredModal').classList.remove('hidden')"
-                    class="bg-blue-100 hover:bg-blue-200 text-blue-700 px-6 py-2 rounded-full font-medium flex items-center justify-center gap-2 shadow transition">
-                    <i class="bx bx-table"></i> View Recent Predictions
-                </button>
+                <!-- Export Report CSV -->
+                <a href="{{ url_for('export_all') }}?format=csv"
+                    class=" bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounded-full font-medium flex items-center gap-2 justify-start shadow transition">
+                    <i class='bx bx-spreadsheet text-xl'></i> Export Report (CSV)
+                </a>
+
+                <!-- Export Report PDF -->
+                <a href="{{ url_for('export_all') }}?format=pdf"
+                    class=" bg-green-100 hover:bg-green-200 text-green-700 px-6 py-2 rounded-full font-medium flex items-center gap-2 justify-start shadow transition">
+                    <i class='bx bxs-file-pdf text-xl'></i> Export Report (PDF)
+                </a>
             </div>
 
             <!-- Clickable Div to Open Chatbot -->
@@ -150,6 +301,83 @@
         </div>
     </main>
 </div>
+
+<!-- Floating Chat Button -->
+<button id="chat-toggle"
+    class="fixed bottom-4 right-4 bg-green-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg z-50 hover:bg-green-700">
+    💬
+</button>
+
+<!-- Chat Widget -->
+<div id="chat-widget" class="fixed bottom-20 right-4 w-[300px] hidden z-50">
+    <div class="bg-white shadow-lg rounded-lg flex flex-col overflow-hidden">
+        <div class="bg-green-600 text-white p-3 font-semibold flex justify-between items-center">
+            CattleCare AI Chat
+            <button id="chat-close" class="text-white font-bold">✖</button>
+        </div>
+        <div id="chat-messages" class="p-3 h-64 overflow-y-auto space-y-2 bg-gray-50"></div>
+        <div class="flex border-t border-gray-200">
+            <input id="chat-input" type="text" placeholder="Ask about cattle or farm..."
+                class="flex-1 p-2 outline-none">
+            <button id="chat-send" class="bg-green-600 text-white px-4">Send</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const sendBtn = document.getElementById("chat-send");
+    const chatInput = document.getElementById("chat-input");
+    const chatMessages = document.getElementById("chat-messages");
+    const chatWidget = document.getElementById("chat-widget");
+    const chatToggle = document.getElementById("chat-toggle");
+    const chatClose = document.getElementById("chat-close");
+
+    // Toggle chat visibility
+    chatToggle.addEventListener("click", () => {
+        chatWidget.classList.remove("hidden");
+        chatToggle.classList.add("hidden");
+        chatInput.focus();
+    });
+
+    chatClose.addEventListener("click", () => {
+        chatWidget.classList.add("hidden");
+        chatToggle.classList.remove("hidden");
+    });
+
+    function addMessage(text, sender) {
+        const div = document.createElement("div");
+        div.className = sender === "user"
+            ? "text-right text-gray-700"
+            : "text-left text-gray-900 bg-gray-200 p-2 rounded";
+        div.textContent = text;
+        chatMessages.appendChild(div);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        addMessage(message, "user");
+        chatInput.value = "";
+
+        try {
+            const res = await fetch("/chatbotcm", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message })
+            });
+            const data = await res.json();
+            addMessage(data.reply || "No response", "bot");
+        } catch (err) {
+            addMessage("Error connecting to server.", "bot");
+        }
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+    chatInput.addEventListener("keypress", e => {
+        if (e.key === "Enter") sendMessage();
+    });
+</script>
 
 <!-- Boxicons CDN -->
 <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
@@ -236,23 +464,23 @@
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#039;');
     }
-
     let sending = false;
+
     async function sendMessage() {
         if (sending) return;
         const input = document.getElementById('chatInput');
+        const chatWindow = document.getElementById('chatWindow');
         const text = input.value.trim();
         if (!text) return;
 
+        // User message
         appendMessage(`<strong>You:</strong> ${escapeHtml(text)}`, 'user');
         input.value = "";
-        input.focus();
 
-        // Create unique loading bubble
+        // Loading bubble
         const loadingId = 'loading_' + Date.now();
         appendMessage(`<em>🤔 Thinking...</em>`, 'bot', loadingId);
 
-        // Animate "thinking..."
         let dots = 0;
         const interval = setInterval(() => {
             const bubble = document.getElementById(loadingId);
@@ -268,17 +496,14 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: text })
             });
-
             const data = await res.json();
-            clearInterval(interval);
             document.getElementById(loadingId).innerHTML = `<strong>Bot:</strong> ${escapeHtml(data.response)}`;
         } catch (err) {
-            clearInterval(interval);
-            document.getElementById(loadingId).innerHTML = `<strong>Bot:</strong> Error contacting server.`;
             console.error(err);
+            document.getElementById(loadingId).innerHTML = `<strong>Bot:</strong> Error contacting server.`;
         } finally {
+            clearInterval(interval);
             sending = false;
-            const chatWindow = document.getElementById('chatWindow');
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
     }
@@ -289,6 +514,10 @@
             sendMessage();
         }
     });
+
+    function toggleChatbot() {
+        document.getElementById('chatbotBox').classList.toggle('hidden');
+    }
 </script>
 
 
@@ -622,6 +851,7 @@
 
     </div>
 </div>
+
 <!-- Modal -->
 <div id="recentPredModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div class="bg-white w-full max-w-4xl rounded-2xl shadow-lg p-6 relative overflow-y-auto max-h-[90vh]">
@@ -680,138 +910,145 @@
 
 
 
-
 <!-- Modal chart -->
 <div id="aiInsightsModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-    <div class="bg-white w-full max-w-5xl rounded-2xl shadow-lg p-6 relative overflow-y-auto max-h-[90vh]">
+    <div class="bg-white w-full max-w-6xl rounded-2xl shadow-lg p-6 relative overflow-y-auto max-h-[90vh]">
         <!-- Close Button -->
         <button onclick="document.getElementById('aiInsightsModal').classList.add('hidden')"
             class="absolute top-4 right-4 text-gray-500 hover:text-red-600 text-2xl">
             &times;
         </button>
 
-        <h3 class="text-2xl font-bold mb-4 text-center">AI Insights</h3>
+        <h3 class="text-2xl font-bold mb-4 text-center text-gray-700">AI Insights</h3>
 
-        <!-- Your Chart Content -->
+        <!-- Grid: 2 Rows x 2 Cols -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            <!-- Last prediction vs historical -->
             {% if plot_data %}
             <div class="bg-white rounded-xl shadow p-4">
-                <h5 class="text-lg font-semibold mb-2">Last prediction vs historical</h5>
+                <h5 class="text-lg font-semibold mb-2 text-gray-600">Last Prediction vs Historical</h5>
                 <canvas id="histPredChart" style="height:250px;"></canvas>
-
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                    try {
-                        const ctx = document.getElementById('histPredChart');
-                        const plotData = {{ plot_data | tojson | safe
-                    }};
-                    const labels = ['Historical Avg', 'Predicted'];
-                    const dataValues = [plotData.historical || 0, plotData.predicted || 0];
-
-                    new Chart(ctx, {
-                        type: 'bar',
-                        data: {
-                            labels: labels,
-                            datasets: [{
-                                label: 'Milk Yield (L/day)',
-                                data: dataValues,
-                                backgroundColor: ['#3B82F6', '#10B981'],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: { responsive: true, scales: { y: { beginAtZero: true } } }
-                    });
-                    } catch (err) {
-                        console.error('Error rendering historical vs predicted chart:', err);
-                    }
-                </script>
             </div>
             {% endif %}
 
+            <!-- Feature Contribution -->
             {% if shap_values %}
             <div class="bg-white rounded-xl shadow p-4">
-                <h5 class="text-lg font-semibold mb-2">Feature Contribution (Top 5)</h5>
+                <h5 class="text-lg font-semibold mb-2 text-gray-600">Feature Contribution (Top 5)</h5>
                 <canvas id="shapChart" style="height:250px;"></canvas>
-                <script>
-                    try {
-                        const ctx = document.getElementById('shapChart');
-                        const shapData = {{ shap_values | tojson | safe
-                    }};
-
-                    if (Array.isArray(shapData) && shapData.length > 0) {
-                        const shapLabels = shapData.slice(0, 5).map(item => item[0]);
-                        const shapScores = shapData.slice(0, 5).map(item => item[1]);
-
-                        new Chart(ctx, {
-                            type: 'bar',
-                            data: {
-                                labels: shapLabels,
-                                datasets: [{
-                                    label: 'SHAP Impact',
-                                    data: shapScores,
-                                    backgroundColor: 'rgba(34,197,94,0.6)',
-                                    borderWidth: 1
-                                }]
-                            },
-                            options: { responsive: true, scales: { y: { beginAtZero: true } } }
-                        });
-                    }
-                    } catch (err) {
-                        console.error('Error rendering SHAP chart:', err);
-                    }
-                </script>
             </div>
             {% endif %}
 
+            <!-- Breed Distribution -->
             {% if records|length > 0 %}
             <div class="bg-white rounded-xl shadow p-4">
-                <h5 class="text-lg font-semibold mb-2">Breed Distribution</h5>
-                <canvas id="breedChart"></canvas>
+                <h5 class="text-lg font-semibold mb-2 text-gray-600">Breed Distribution</h5>
+                <canvas id="breedChart" style="height:250px;"></canvas>
             </div>
 
+            <!-- Predicted Disease Distribution -->
             <div class="bg-white rounded-xl shadow p-4">
-                <h5 class="text-lg font-semibold mb-2">Predicted Disease Distribution</h5>
-                <canvas id="diseaseChart"></canvas>
+                <h5 class="text-lg font-semibold mb-2 text-gray-600">Predicted Disease Distribution</h5>
+                <canvas id="diseaseChart" style="height:250px;"></canvas>
             </div>
-
-            <script>
-                const recordsData = {{ records_json | tojson }};
-                const breedCounts = {};
-                const diseaseCounts = {};
-
-                recordsData.forEach(r => {
-                    breedCounts[r.breed] = (breedCounts[r.breed] || 0) + 1;
-                    diseaseCounts[r.predicted_disease] = (diseaseCounts[r.predicted_disease] || 0) + 1;
-                });
-
-                new Chart(document.getElementById('breedChart'), {
-                    type: 'pie',
-                    data: {
-                        labels: Object.keys(breedCounts),
-                        datasets: [{
-                            data: Object.values(breedCounts),
-                            backgroundColor: ['#3B82F6', '#F59E0B', '#10B981', '#EF4444']
-                        }]
-                    }
-                });
-
-                new Chart(document.getElementById('diseaseChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(diseaseCounts),
-                        datasets: [{
-                            data: Object.values(diseaseCounts),
-                            backgroundColor: 'rgba(239,68,68,0.6)',
-                            borderRadius: 6
-                        }]
-                    },
-                    options: { indexAxis: 'y', responsive: true, scales: { x: { beginAtZero: true } } }
-                });
-            </script>
             {% endif %}
         </div>
+
+        <!-- Chart.js -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // Prediction vs Historical (Pastel)
+            try {
+                const ctxHist = document.getElementById('histPredChart');
+                const plotData = {{ plot_data | tojson | safe
+            }};
+            if (ctxHist && plotData) {
+                new Chart(ctxHist, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Historical Avg', 'Predicted'],
+                        datasets: [{
+                            label: 'Milk Yield (L/day)',
+                            data: [plotData.historical || 0, plotData.predicted || 0],
+                            backgroundColor: ['#A5B4FC', '#6EE7B7'], // pastel indigo, green
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                });
+            }
+            } catch (err) { console.error(err); }
+
+            // SHAP Feature Contribution (Pastel)
+            try {
+                const ctxShap = document.getElementById('shapChart');
+                const shapData = {{ shap_values | tojson | safe
+            }};
+            if (ctxShap && Array.isArray(shapData) && shapData.length > 0) {
+                const shapLabels = shapData.slice(0, 5).map(item => item[0]);
+                const shapScores = shapData.slice(0, 5).map(item => item[1]);
+
+                new Chart(ctxShap, {
+                    type: 'bar',
+                    data: {
+                        labels: shapLabels,
+                        datasets: [{
+                            label: 'SHAP Impact',
+                            data: shapScores,
+                            backgroundColor: '#FBCFE8', // pastel pink
+                            borderRadius: 8
+                        }]
+                    },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                });
+            }
+            } catch (err) { console.error(err); }
+
+            // Breed Distribution (Pastel)
+            try {
+                const recordsData = {{ records_json | tojson
+            }};
+            const breedCounts = {};
+            const diseaseCounts = {};
+
+            recordsData.forEach(r => {
+                breedCounts[r.breed] = (breedCounts[r.breed] || 0) + 1;
+                diseaseCounts[r.predicted_disease] = (diseaseCounts[r.predicted_disease] || 0) + 1;
+            });
+
+            new Chart(document.getElementById('breedChart'), {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(breedCounts),
+                    datasets: [{
+                        data: Object.values(breedCounts),
+                        backgroundColor: ['#93C5FD', '#FDE68A', '#A7F3D0', '#FCA5A5'] // pastel blue, yellow, green, red
+                    }]
+                }
+            });
+
+            // Disease Distribution (Pastel)
+            new Chart(document.getElementById('diseaseChart'), {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(diseaseCounts),
+                    datasets: [{
+                        data: Object.values(diseaseCounts),
+                        backgroundColor: '#FDE68A', // pastel yellow
+                        borderRadius: 8
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true, scales: { x: { beginAtZero: true } } }
+            });
+            } catch (err) { console.error(err); }
+        </script>
     </div>
+
 </div>
+
+
+
 
 
 {% endblock %}

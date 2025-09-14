@@ -1,32 +1,21 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="relative min-h-screen flex items-center justify-center">
+<div class="relative min-h-screen flex items-center justify-center bg-[#f9fbf9]">
 
-    <!-- Background Video -->
-    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
-        <source src="{{ url_for('static', filename='mp3/hero.mp4') }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+    <!-- OTP Card -->
+    <div class="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-xl p-10">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-4">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="h-10 w-auto">
+            <h1 class="text-2xl font-medium text-gray-800 text-[#6BAE55]">CattleCare</h1>
+        </div>
 
-    <!-- Background Music -->
-    <audio autoplay loop>
-        <source src="{{ url_for('static', filename='mp3/hero.mp3') }}" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
-    <!-- Overlay -->
-    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-
-    <!-- White Card for OTP Form -->
-    <div class="relative z-10 bg-white p-8  shadow-xl w-full max-w-md">
-        <h2 class="text-3xl font-medium text-gray-800 text-center uppercase">
-            Verify OTP
-        </h2>
+        <h2 class="text-xl font-normal text-gray-900 uppercase text-center mb-2">Verify OTP</h2>
+        <p class="text-gray-500 text-center mb-6">Enter the 6-digit OTP sent to your email</p>
 
         <!-- OTP Form -->
-        <form method="POST" id="otpForm" class="mt-6 space-y-6 flex flex-col items-center">
-            <!-- 6 OTP Boxes -->
+        <form method="POST" id="otpForm" class="space-y-6 flex flex-col items-center">
             <div class="flex justify-center gap-3">
                 {% for i in range(6) %}
                 <input type="text" name="otp{{ i }}" maxlength="1"
@@ -35,15 +24,18 @@
                 {% endfor %}
             </div>
 
-            <!-- Hidden field to store combined OTP -->
             <input type="hidden" name="otp" id="otpHidden">
 
-            <!-- Verify Button -->
             <button type="submit"
-                class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition text-white font-medium px-5 py-3 shadow w-full">
+                class="w-full py-3 bg-[#6BAE55] text-white font-medium rounded-lg shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
                 Verify & Login
             </button>
         </form>
+
+        <div class="mt-6 text-center text-gray-500 text-sm">
+            Didn't receive OTP?
+            <a href="#" class="text-blue-600 hover:underline">Resend</a>
+        </div>
     </div>
 </div>
 

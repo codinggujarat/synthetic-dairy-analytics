@@ -1,33 +1,21 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<div class="relative min-h-screen flex items-center justify-center">
+<div class="relative min-h-screen flex items-center justify-center bg-[#f9fbf9]">
+    <!-- OTP + Password Card -->
+    <div class="relative z-10 w-full max-w-md bg-white rounded-2xl shadow-xl p-10">
+        <!-- Header -->
+        <div class="flex items-center gap-3 mb-4">
+            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="h-10 w-auto">
+            <h1 class="text-2xl font-medium text-gray-800 text-[#6BAE55]">CattleCare</h1>
+        </div>
 
-    <!-- Background Video -->
-    <video autoplay muted loop playsinline class="absolute inset-0 w-full h-full object-cover">
-        <source src="{{ url_for('static', filename='mp3/hero.mp4') }}" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
+        <h2 class="text-xl font-normal text-gray-900 uppercase text-center mb-2">Verify OTP</h2>
+        <p class="text-gray-500 text-center mb-6">Enter the 6-digit OTP and create your password</p>
 
-    <!-- Background Music -->
-    <audio autoplay loop>
-        <source src="{{ url_for('static', filename='mp3/hero.mp3') }}" type="audio/mpeg">
-        Your browser does not support the audio element.
-    </audio>
-
-    <!-- Overlay -->
-    <div class="absolute inset-0 bg-black bg-opacity-40"></div>
-
-    <!-- White Card for OTP + Password -->
-    <div class="relative z-10 bg-white p-8  shadow-xl w-full max-w-md">
-        <h2 class="text-3xl font-medium text-gray-800 text-center uppercase">
-            Verify OTP
-        </h2>
-
-        <!-- Verify Signup Form -->
-        <form method="POST" id="otpForm" class="mt-6 space-y-6 flex flex-col items-center">
-
-            <!-- OTP Input Boxes -->
+        <!-- Signup OTP Form -->
+        <form method="POST" id="otpForm" class="space-y-6 flex flex-col items-center">
+            <!-- OTP Inputs -->
             <div class="flex justify-center gap-3">
                 {% for i in range(6) %}
                 <input type="text" name="otp{{ i }}" maxlength="1"
@@ -36,10 +24,9 @@
                 {% endfor %}
             </div>
 
-            <!-- Hidden field to store combined OTP -->
             <input type="hidden" name="otp" id="otpHidden">
 
-            <!-- Password Input with Floating Label -->
+            <!-- Password Input -->
             <div class="relative w-full">
                 <input type="password" name="password" id="password" required
                     class="peer block w-full px-4 pt-6 pb-2 text-black placeholder-transparent border-2 border-gray-300 rounded-lg focus:border-green-600 focus:ring-0 focus:outline-none">
@@ -49,12 +36,18 @@
                 </label>
             </div>
 
-            <!-- Verify & Create Button -->
+            <!-- Submit Button -->
             <button type="submit"
-                class="flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 transition text-white font-medium px-5 py-3 rounded-lg shadow w-full">
+                class="w-full py-3 bg-[#6BAE55] text-white font-medium rounded-lg shadow hover:bg-green-700 transition flex items-center justify-center gap-2">
                 Verify & Create Account
             </button>
         </form>
+
+        <!-- Footer -->
+        <div class="mt-6 text-center text-gray-500 text-sm">
+            Already have an account?
+            <a href="{{ url_for('auth.login') }}" class="text-blue-600 hover:underline">Login</a>
+        </div>
     </div>
 </div>
 

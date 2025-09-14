@@ -83,13 +83,23 @@ def generate_row():
         "weight": float(round(weight, 1)),
         "lactation_stage": lactation_stage,
         "parity": parity,
+        "hist_yield_avg7": float(round(hist_yield, 2)),   # added back
         "feed_type": feed_type,
         "feed_quality": float(round(feed_quality, 2)),
         "feed_qty_kg": float(round(feed_qty, 2)),
+        "walking_km": float(round(walking_km, 2)),        # added back
+        "grazing_h": float(round(grazing_h, 2)),          # added back
         "rumination_h": float(round(rumination_h, 2)),
         "resting_h": float(round(resting_h, 2)),
-        "health_score": float(round(health_score)),
+        "body_temp": float(round(body_temp, 2)),          # added back
+        "heart_rate": heart_rate,                         # added back
+        "ambient_temp": float(round(ambient_temp, 2)),    # added back
+        "humidity": float(round(humidity, 2)),            # added back
+        "housing_score": float(round(housing_score, 2)),  # added back
         "vaccinations_up_to_date": vaccinations_up_to_date,
+        "disease_history_count": disease_history_count,   # added back
+        "season": season,                                 # added back
+        "health_score": float(round(health_score, 2)),
         "disease_label": disease_label,
         "milk_yield": float(round(milk_yield, 2)),
         "feed_efficiency": float(round(feed_efficiency, 2)),

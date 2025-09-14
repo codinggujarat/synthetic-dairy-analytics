@@ -35,3 +35,32 @@ class AnimalRecord(db.Model):
 
     def to_series(self):
         return pd.Series({c.name: getattr(self, c.name) for c in self.__table__.columns})
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "breed": self.breed,
+            "age": self.age,
+            "weight": self.weight,
+            "lactation_stage": self.lactation_stage,
+            "parity": self.parity,
+            "hist_yield_avg7": self.hist_yield_avg7,
+            "feed_type": self.feed_type,
+            "feed_quality": self.feed_quality,
+            "feed_qty_kg": self.feed_qty_kg,
+            "walking_km": self.walking_km,
+            "grazing_h": self.grazing_h,
+            "rumination_h": self.rumination_h,
+            "resting_h": self.resting_h,
+            "body_temp": self.body_temp,
+            "heart_rate": self.heart_rate,
+            "ambient_temp": self.ambient_temp,
+            "humidity": self.humidity,
+            "housing_score": self.housing_score,
+            "vaccinations_up_to_date": self.vaccinations_up_to_date,
+            "disease_history_count": self.disease_history_count,
+            "season": self.season,
+            "predicted_milk_yield": self.predicted_milk_yield,
+            "predicted_disease": self.predicted_disease,
+            "disease_probs": self.disease_probs,
+            "created_at": self.created_at
+        }

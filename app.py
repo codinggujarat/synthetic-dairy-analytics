@@ -14,10 +14,15 @@ import joblib
 import matplotlib.pyplot as plt
 import traceback
 import google.generativeai as genai
+import requests
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
+GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta2/models/text-bison-001:generate"
+
+API_KEY = os.getenv("GEMINI_API_KEY")
+API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key={API_KEY}"
 
 
 # Extensions (must exist in your project)
@@ -268,10 +273,10 @@ def index():
     )
 
 
-@app.route('/predict-animal', methods=['POST'])  # ✅ Changed route URL
+@app.route('/predict-animal', methods=['POST'])
 @login_required
-def predict_animal():  # ✅ Changed function name
-    """Handles form submission and redirects to /recent"""
+def predict_animal():
+    """Handles form submission, prediction, saving, and shows top 10 recent cow cards."""
     if not artifacts.get('loaded'):
         flash("Models not loaded, train manually first.", "warning")
         return redirect(url_for("input_form"))
@@ -306,24 +311,50 @@ def predict_animal():  # ✅ Changed function name
         probs = clf.predict_proba(X_t)[0]
         classes = list(le.classes_)
         top_class = classes[int(np.argmax(probs))]
+        proba_map = dict(zip(classes, probs))
 
+        # Save record
         record = AnimalRecord(
             **data,
             predicted_milk_yield=milk_pred,
             predicted_disease=top_class,
-            disease_probs=json.dumps(dict(zip(classes, probs))),
+            disease_probs=json.dumps(proba_map),
             created_at=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         )
         db.session.add(record)
         db.session.commit()
 
         flash(f"✅ Prediction saved! Yield: {milk_pred:.2f} L/day | Condition: {top_class}", "success")
+
     except Exception as e:
         db.session.rollback()
         flash(f"Prediction failed: {e}", "danger")
         traceback.print_exc()
+        return redirect(url_for("recent_predictions"))
 
-    return redirect(url_for("recent_predictions"))
+    # --- Fetch top 10 recent records to render cards ---
+    recent_records = AnimalRecord.query.order_by(AnimalRecord.id.desc()).limit(10).all()
+    records_json = []
+    for r in recent_records:
+        try:
+            disease_probs = json.loads(r.disease_probs) if r.disease_probs else {}
+        except Exception:
+            disease_probs = {}
+        records_json.append({
+            "id": r.id,
+            "breed": getattr(r, 'breed', 'Unknown'),
+            "age": getattr(r, 'age', 0),
+            "weight": getattr(r, 'weight', 0),
+            "lactation_stage": getattr(r, 'lactation_stage', 'Unknown'),
+            "parity": getattr(r, 'parity', 0),
+            "predicted_milk_yield": getattr(r, 'predicted_milk_yield', 0),
+            "predicted_disease": getattr(r, 'predicted_disease', 'Unknown'),
+            "disease_probs": disease_probs,
+            "created_at": getattr(r, 'created_at', '')
+        })
+
+    # Render template with top 10 cards
+    return render_template("recent_predictions.html", records_json=records_json)
 
 @app.route('/predict', methods=['POST'])
 @login_required
@@ -708,36 +739,41 @@ def generate_report():
     """
     fmt = request.args.get('format', 'csv').lower()
 
-    # Step 1: Load data from CSV if exists, otherwise fallback to DB
+    # Step 1: Load data
     data_path = os.path.join(basedir, "data", "cattle_synthetic.csv")
     if os.path.exists(data_path):
         df = pd.read_csv(data_path)
-        # Ensure necessary columns exist
-        for col in ['predicted_milk_yield', 'predicted_disease', 'id']:
-            if col not in df.columns:
-                df[col] = 0.0 if col == 'predicted_milk_yield' else ("Unknown" if col == 'predicted_disease' else range(1, len(df)+1))
     else:
         records = AnimalRecord.query.order_by(AnimalRecord.id.asc()).all()
         if not records:
             flash("No data available for report generation.", "warning")
             return redirect(url_for('index'))
         df = pd.DataFrame([record_to_feature_dict(r) for r in records])
-        df['predicted_milk_yield'] = [getattr(r, 'predicted_milk_yield', 0.0) for r in records]
-        df['predicted_disease'] = [getattr(r, 'predicted_disease', 'Unknown') for r in records]
-        df['id'] = [r.id for r in records]
 
-    # Step 2: Compute summaries
-    milk_summary = df.groupby('breed')['predicted_milk_yield'].agg(['mean', 'min', 'max']).reset_index()
-    milk_summary.rename(columns={'mean': 'avg_milk_yield', 'min': 'min_milk_yield', 'max': 'max_milk_yield'}, inplace=True)
+    # Step 1.1: Ensure expected columns exist
+    required_cols = [
+        "breed","age","weight","lactation_stage","parity","hist_yield_avg7",
+        "feed_type","feed_quality","feed_qty_kg","walking_km","grazing_h","rumination_h",
+        "resting_h","body_temp","heart_rate","ambient_temp","humidity","housing_score",
+        "vaccinations_up_to_date","disease_history_count","season","health_score",
+        "disease_label","milk_yield","feed_efficiency"
+    ]
+    for col in required_cols:
+        if col not in df.columns:
+            df[col] = 0 if col not in ["breed","feed_type","season","disease_label"] else "Unknown"
 
-    feed_summary = df.groupby('feed_type')['feed_qty_kg'].agg(['mean', 'sum']).reset_index()
-    feed_summary.rename(columns={'mean': 'avg_feed_qty', 'sum': 'total_feed_qty'}, inplace=True)
+    # Step 2: Summaries
+    milk_summary = df.groupby('breed')['milk_yield'].agg(['mean','min','max']).reset_index()
+    milk_summary.rename(columns={'mean':'avg_milk_yield','min':'min_milk_yield','max':'max_milk_yield'}, inplace=True)
 
-    health_summary = df.groupby('predicted_disease').agg({
-        'id': 'count',
-        'predicted_milk_yield': ['mean', 'min', 'max']
+    feed_summary = df.groupby('feed_type')['feed_qty_kg'].agg(['mean','sum']).reset_index()
+    feed_summary.rename(columns={'mean':'avg_feed_qty','sum':'total_feed_qty'}, inplace=True)
+
+    health_summary = df.groupby('disease_label').agg({
+        'age': 'count',
+        'milk_yield': ['mean','min','max']
     }).reset_index()
-    health_summary.columns = ['disease', 'count', 'avg_milk_yield', 'min_milk_yield', 'max_milk_yield']
+    health_summary.columns = ['disease','count','avg_milk_yield','min_milk_yield','max_milk_yield']
 
     # Step 3: Export
     if fmt == 'csv':
@@ -794,7 +830,7 @@ def generate_report():
     else:
         flash("Invalid report format requested.", "warning")
         return redirect(url_for('index'))
-    
+
 # ------------------------------
 # Add Welcome Route
 # ------------------------------
@@ -906,6 +942,52 @@ User question: "{user_message}"
 
     except Exception as e:
         return jsonify({"response": f"Error: {str(e)}"})
+    
+    
+    
+# --chat bot 2----------------------------
+@app.route("/chatbotcm", methods=["POST"])
+def chatbotcm():
+    user_message = request.json.get("message", "").strip().lower()
+
+    # Only allow cattle/cow related queries
+    keywords = ["cow", "cattle", "milk", "farm", "dairy", "livestock", "cattlecare ai"]
+    if not any(word in user_message for word in keywords):
+        return jsonify({"reply": "Sorry, I only answer questions about cattle or cows."})
+
+    if not API_KEY:
+        return jsonify({"error": "GEMINI_API_KEY environment variable not set."}), 500
+
+    payload = {
+        "contents": [{"parts": [{"text": user_message}]}],
+        "systemInstruction": {
+            "parts": [{"text": "You are CattleCare AI, a friendly assistant specialized in cattle, cow, and farm insights. Answer only questions about cattle and farm management."}]
+        }
+    }
+
+    headers = {"Content-Type": "application/json"}
+
+    try:
+        response = requests.post(API_URL, headers=headers, json=payload)
+        response.raise_for_status()
+        api_response = response.json()
+
+        bot_reply = "I'm having trouble answering right now."
+        try:
+            bot_reply = api_response['candidates'][0]['content']['parts'][0]['text']
+        except (KeyError, IndexError):
+            pass
+
+        return jsonify({"reply": bot_reply})
+
+    except requests.exceptions.RequestException as e:
+        print(f"API request error: {e}")
+        return jsonify({"error": "Could not connect to Gemini API."}), 503
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return jsonify({"error": "Internal server error."}), 500
+
+
 # ------------------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)
