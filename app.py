@@ -15,6 +15,16 @@ import matplotlib.pyplot as plt
 import traceback
 import google.generativeai as genai
 import requests
+import os, io, json, base64, traceback
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
+from flask_sqlalchemy import SQLAlchemy
+import pandas as pd
+import numpy as np
+import joblib
+from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
+from sklearn.preprocessing import LabelEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
 
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
@@ -226,6 +236,7 @@ def index():
     feed_efficiency = avg_weight = avg_temp = avg_heart_rate = vaccination_rate = 0
     breed_counts = {}
     health_score = 0
+    cow_table_html = None  # NEW
 
     try:
         data_path = os.path.join(basedir, "data", "cattle_synthetic.csv")
@@ -235,12 +246,10 @@ def index():
             if not df.empty:
                 total_animals = len(df)
                 avg_milk_yield = round(df["milk_yield"].mean(), 2)
-                # Convert disease_label to string and lowercase
                 df['disease_label'] = df['disease_label'].astype(str).str.strip().str.lower()
                 healthy_animals = len(df[df["disease_label"] == "healthy"])
                 unhealthy_animals = total_animals - healthy_animals
 
-                # Health score
                 if "health_score" in df.columns:
                     health_score = round(df["health_score"].mean(), 2)
 
@@ -250,6 +259,14 @@ def index():
                 avg_heart_rate = round(df["heart_rate"].mean(), 2) if "heart_rate" in df.columns else 0
                 vaccination_rate = round(df["vaccinations_up_to_date"].mean() * 100, 2) if "vaccinations_up_to_date" in df.columns else 0
                 breed_counts = df["breed"].value_counts().to_dict() if "breed" in df.columns else {}
+
+                # ✅ Generate HTML table for template
+                cow_table_html = df.to_html(
+                    classes="display stripe hover",
+                    index=False,
+                    escape=False,
+                    table_id="cowTable"
+                )
         else:
             flash("No CSV found at data/cattle_synthetic.csv.", "warning")
 
@@ -276,9 +293,9 @@ def index():
         records_json=records_json,
         plot_data=plot_data,
         shap_values=shap_values,
-        artifacts_loaded=artifacts.get('loaded', False)
+        artifacts_loaded=artifacts.get('loaded', False),
+        cow_table=cow_table_html  # ✅ Pass table to template
     )
-
 
 @app.route('/predict-animal', methods=['POST'])
 @login_required
@@ -1009,7 +1026,7 @@ def chatbotcm():
         print(f"Unexpected error: {e}")
         return jsonify({"error": "Internal server error."}), 500
 
-
+# Route to display cattle info
 # ------------------------------
 if __name__ == '__main__':
     app.run(host='0.0.0.0', debug=True)

@@ -1,6 +1,0 @@
-age,weight,parity,hist_yield_avg7,feed_quality,feed_qty_kg,walking_km,grazing_h,rumination_h,resting_h,body_temp,heart_rate,ambient_temp,humidity,housing_score,vaccinations_up_to_date,disease_history_count,breed,lactation_stage,feed_type,season,milk_yield,disease_label
-5.0,550.0,2.0,22.0,7.0,18.0,2.0,3.0,5.0,10.0,38.5,65.0,25.0,60.0,7.0,1,0,Holstein,mid,mixed,autumn,26.584400000000006,none
-5.0,550.0,2.0,22.0,7.0,18.0,2.0,3.0,5.0,10.0,38.5,65.0,25.0,60.0,7.0,1,0,Jersey,mid,mixed,autumn,18.484200000000005,none
-5.0,550.0,2.0,22.0,7.0,18.0,2.0,3.0,5.0,10.0,38.5,65.0,25.0,60.0,7.0,1,0,Brown Swiss,mid,mixed,autumn,20.271866666666668,none
-5.0,550.0,2.0,22.0,7.0,18.0,2.0,3.0,5.0,10.0,38.5,65.0,25.0,60.0,7.0,1,0,Buffalo,mid,mixed,autumn,10.87213333333332,none
-5.0,550.0,2.0,22.0,7.0,18.0,2.0,3.0,5.0,10.0,38.5,65.0,25.0,60.0,7.0,1,0,Jersey,mid,mixed,autumn,19.803733333333334,none

@@ -23,6 +23,10 @@
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
     <script src="https://unpkg.com/scrollreveal"></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
 
     <style>
         * {
@@ -63,8 +67,7 @@
                     <!-- Logo -->
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-md bg-[#fff] flex items-center justify-center">
-                            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo"
-                                class="h-50 w-auto">
+                            <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" class="h-50 w-auto">
                             <i class="fas fa-wave-square text-white text-lg"></i>
                         </div>
                         <div>
