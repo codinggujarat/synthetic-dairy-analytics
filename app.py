@@ -429,7 +429,7 @@ def predict_route():
         traceback.print_exc()
         return redirect(url_for('index'))
 
-    # Save to DB
+    # --- Save to Database ---
     try:
         record = AnimalRecord(
             **data,
@@ -439,7 +439,6 @@ def predict_route():
             created_at=datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')
         )
 
-        # If you added shap_values column in your DB, save it
         if shap_values:
             try:
                 record.shap_values = json.dumps(shap_values)
@@ -448,16 +447,31 @@ def predict_route():
 
         db.session.add(record)
         db.session.commit()
-
         print(f"[DEBUG] Saved Record ID={record.id}, Disease={top_class}, Yield={milk_pred:.2f}")
     except Exception as e:
         db.session.rollback()
         flash(f"Failed to save prediction: {e}", "warning")
         traceback.print_exc()
 
+    # --- Append to CSV file ---
+    try:
+        csv_path = os.path.join(app.static_folder, 'cattle_synthetic.csv')
+        data_to_save = data.copy()
+        data_to_save['milk_yield'] = milk_pred
+        data_to_save['disease_label'] = top_class
+        df_to_save = pd.DataFrame([data_to_save])
+
+        if os.path.exists(csv_path):
+            df_to_save.to_csv(csv_path, mode='a', index=False, header=False)
+        else:
+            df_to_save.to_csv(csv_path, index=False, header=True)
+
+        print(f"[DEBUG] Appended new record to {csv_path}")
+    except Exception as e:
+        print(f"[WARN] Could not append to CSV: {e}")
+
     flash(f"Predicted milk yield: {milk_pred:.2f} L/day | Condition: {top_class}", "success")
     return redirect(url_for('index'))
-# ------------------------------
 # Training function (moved from train_models.py)
 # ------------------------------
 def train_and_save(df=None, n_estimators=100):
